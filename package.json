@@ -4,7 +4,7 @@
   "description": "Native bindings to the dynamic shared library linker (dlfcn)",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec"
+    "test": "mocha -gc --reporter spec"
   },
   "repository": {
     "type": "git",

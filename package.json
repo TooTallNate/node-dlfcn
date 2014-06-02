@@ -1,0 +1,41 @@
+{
+  "name": "dlfcn",
+  "version": "0.0.0",
+  "description": "Native bindings to the dynamic shared library linker (dlfcn)",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/TooTallNate/node-dlfcn.git"
+  },
+  "keywords": [
+    "c",
+    "dlopen",
+    "dlsym",
+    "dlclose",
+    "dlerror",
+    "dlfcn",
+    "dyld",
+    "dynamic",
+    "library",
+    "so",
+    "dll",
+    "dylib"
+  ],
+  "author": "Nathan Rajlich <nathan@tootallnate.net> (http://n8.io/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TooTallNate/node-dlfcn/issues"
+  },
+  "homepage": "https://github.com/TooTallNate/node-dlfcn",
+  "dependencies": {
+    "bindings": "1.2.0",
+    "debug": "0.8.1",
+    "nan": "1.1.2"
+  },
+  "devDependencies": {
+    "mocha": "1.20.0"
+  }
+}

@@ -96,14 +96,22 @@ Library.prototype.close = function () {
  * memory location of the requested "symbol".
  *
  * @param {String} name - Symbol name to attempt to retrieve
+ * @param {Number} [size] - Optional byte length of the returned Buffer instance. Defaults to 0.
+ * @param {Function} [cb] - Optional callback function to invoke when the Buffer instance is garbage collected from JavaScript land.
  * @return {Buffer} a Buffer instance pointing to the memory address of the symbol
  * @api public
  */
 
-Library.prototype.get = function (name) {
+Library.prototype.get = function (name, size, cb) {
   debug('get()', name);
 
-  var sym = bindings.dlsym(this.lib_t, name);
+  // allow passing `cb` as the second argument, with 0 byte-length
+  if ('function' === typeof size) {
+    cb = size;
+    size = 0;
+  }
+
+  var sym = bindings.dlsym(this.lib_t, name, size, cb);
   debug('dlsym() result', sym);
 
   if ('number' === typeof sym) {

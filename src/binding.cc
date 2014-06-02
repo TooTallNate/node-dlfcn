@@ -80,6 +80,14 @@ NAN_METHOD(Dlclose) {
  */
 
 void dlsym_cb(char *data, void *hint) {
+  NanScope();
+
+  NanCallback* callback = reinterpret_cast<NanCallback *>(hint);
+  if (callback) {
+    v8::Local<v8::Value> argv[] = {};
+    callback->Call(0, argv);
+    delete callback;
+  }
 }
 
 /**
@@ -89,6 +97,10 @@ void dlsym_cb(char *data, void *hint) {
 NAN_METHOD(Dlsym) {
   NanEscapableScope();
 
+  size_t size = 0;
+  NanCallback* callback = NULL;
+  v8::Local<v8::Value> rtn;
+
   v8::Local<v8::Object> buf = args[0].As<v8::Object>();
   lib_t *lib = reinterpret_cast<lib_t *>(node::Buffer::Data(buf));
 
@@ -97,14 +109,26 @@ NAN_METHOD(Dlsym) {
   dlerror(); /* Reset error status. */
 
   void *ptr = dlsym(lib->handle, *name);
-  v8::Local<v8::Object> rtn = NanNewBufferHandle(reinterpret_cast<char *>(ptr), sizeof(void *), dlsym_cb, NULL);
 
   int r = set_dlerror(lib);
   if (r == 0) {
-    NanReturnValue(rtn);
+
+    if (args[2]->IsNumber()) {
+      /* explicit byte length was given. */
+      size = static_cast<size_t>(args[2]->IntegerValue());
+    }
+
+    if (args[3]->IsFunction()) {
+      /* GC callback function was given. */
+      callback = new NanCallback(args[3].As<v8::Function>());
+    }
+
+    rtn = NanNewBufferHandle(reinterpret_cast<char *>(ptr), size, dlsym_cb, callback);
   } else {
-    NanReturnValue(NanNew<v8::Integer>(r));
+    rtn = NanNew<v8::Integer>(r);
   }
+
+  NanReturnValue(rtn);
 }
 
 /**

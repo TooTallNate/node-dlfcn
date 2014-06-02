@@ -102,12 +102,12 @@ Library.prototype.close = function () {
 
 Library.prototype.get = function (name) {
   debug('get()', name);
-  var sym = new Buffer(bindings.sizeof_void_ptr);
-  var r = bindings.dlsym(this.lib_t, name, sym);
-  debug('dlsym() result', r);
-  if (0 !== r) {
+
+  var sym = bindings.dlsym(this.lib_t, name);
+  debug('dlsym() result', sym);
+
+  if ('number' === typeof sym) {
     // error
-    sym = null;
     throw new Error(bindings.dlerror(this.lib_t));
   }
 

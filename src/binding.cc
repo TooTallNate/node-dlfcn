@@ -42,10 +42,6 @@ NAN_METHOD(Dlopen) {
 
   dlerror(); /* Reset error status. */
 
-  if (lib->errmsg) {
-    free(lib->errmsg);
-  }
-
   lib->errmsg = NULL;
 
   // TODO: make RTLD_LAZY configurable
@@ -79,6 +75,14 @@ NAN_METHOD(Dlclose) {
 }
 
 /**
+ * Callback function invoked when a dlsym() Buffer instance
+ * gets garbage collected from JavaScript.
+ */
+
+void dlsym_cb(char *data, void *hint) {
+}
+
+/**
  * dlsym()
  */
 
@@ -90,18 +94,17 @@ NAN_METHOD(Dlsym) {
 
   v8::String::Utf8Value name(args[1]);
 
-  v8::Local<v8::Object> sym_buf = args[2].As<v8::Object>();
-  void **sym = reinterpret_cast<void **>(node::Buffer::Data(sym_buf));
-
   dlerror(); /* Reset error status. */
 
-  /*
   void *ptr = dlsym(lib->handle, *name);
-  memcpy(sym, ptr, sizeof(void *));
-  */
-  *sym = dlsym(lib->handle, *name);
+  v8::Local<v8::Object> rtn = NanNewBufferHandle(reinterpret_cast<char *>(ptr), sizeof(void *), dlsym_cb, NULL);
 
-  NanReturnValue(NanNew<v8::Integer>(set_dlerror(lib)));
+  int r = set_dlerror(lib);
+  if (r == 0) {
+    NanReturnValue(rtn);
+  } else {
+    NanReturnValue(NanNew<v8::Integer>(r));
+  }
 }
 
 /**

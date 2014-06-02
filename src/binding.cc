@@ -172,7 +172,6 @@ void init (v8::Handle<v8::Object> target) {
   NanScope();
 
   target->Set(NanNew<v8::String>("sizeof_lib_t"), NanNew<v8::Integer>(sizeof(lib_t)));
-  target->Set(NanNew<v8::String>("sizeof_void_ptr"), NanNew<v8::Integer>(sizeof(void *)));
 
   NODE_SET_METHOD(target, "dlopen", Dlopen);
   NODE_SET_METHOD(target, "dlclose", Dlclose);

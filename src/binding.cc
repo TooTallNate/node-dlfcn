@@ -84,8 +84,7 @@ void dlsym_cb(char *data, void *hint) {
 
   NanCallback* callback = reinterpret_cast<NanCallback *>(hint);
   if (callback) {
-    v8::Local<v8::Value> argv[0];
-    callback->Call(0, argv);
+    callback->Call(0, NULL);
     delete callback;
   }
 }

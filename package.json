@@ -36,6 +36,7 @@
     "nan": "1.2.0"
   },
   "devDependencies": {
+    "glob": "3.2.11",
     "mocha": "1.20.0",
     "ref": "0.2.3"
   }

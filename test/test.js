@@ -5,6 +5,7 @@
 
 var dl = require('../');
 var ref = require('ref');
+var glob = require('glob');
 var path = require('path');
 var assert = require('assert');
 
@@ -49,7 +50,10 @@ describe('dlfcn', function () {
     });
 
     describe('libtest.c', function () {
-      var libtestPath = path.resolve(__dirname, 'build', 'Release', 'libtest');
+      // find the built .so, .dylib, .dll shared library file.
+      // historically, node-gyp tends to build the file in different places.
+      var pattern = path.resolve(__dirname, '**', 'libtest.{so,dylib,dll}');
+      var libtestPath = glob.sync(pattern)[0];
 
       it('should dynamically open the `libtest.c` shared library', function () {
         var lib = dl(libtestPath);

@@ -1,6 +1,6 @@
 {
   "name": "dlfcn",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Native bindings to the dynamic shared library linker (dlfcn)",
   "main": "index.js",
   "scripts": {

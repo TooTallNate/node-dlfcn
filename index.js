@@ -107,6 +107,8 @@ Library.prototype.get = function (name, size, cb) {
   if ('function' === typeof size) {
     cb = size;
     size = 0;
+  } else if ('number' !== typeof size) {
+    size = 0;
   }
 
   debug('get(%o, %o, %o)', name, size, cb);

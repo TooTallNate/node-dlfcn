@@ -11,6 +11,10 @@
           'dependencies': [
             'deps/dlfcn-win32/dlfcn.gyp:dlfcn'
           ],
+        }, { # OS!="win"
+          'libraries': [
+            '-ldl'
+          ]
         }]
       ]
     }

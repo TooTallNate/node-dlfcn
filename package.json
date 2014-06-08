@@ -32,7 +32,7 @@
   "homepage": "https://github.com/TooTallNate/node-dlfcn",
   "dependencies": {
     "bindings": "1.2.0",
-    "debug": "0.8.1",
+    "debug": "1.0.1",
     "nan": "1.2.0"
   },
   "devDependencies": {

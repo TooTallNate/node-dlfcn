@@ -52,7 +52,7 @@ function Library (name) {
     // append the `ext` if necessary
     var ext = exports.ext[process.platform];
     if (name.substring(name.length - ext.length) !== ext) {
-      debug('appending dynamic lib suffix (%s)', ext, name);
+      debug('appending dynamic lib suffix (%o) to %o', ext, name);
       name += ext;
     }
   } else {
@@ -60,7 +60,7 @@ function Library (name) {
     name = null;
   }
 
-  debug('library name', name);
+  debug('library name: %o', name);
   this.name = name;
 
   // create the `lib_t` data space
@@ -68,7 +68,7 @@ function Library (name) {
 
   // do the `dlopen()` dance
   var r = bindings.dlopen(name, this.lib_t);
-  debug('dlopen() result', r);
+  debug('dlopen(): %o', r);
   if (0 !== r) {
     // error
     throw new Error(bindings.dlerror(this.lib_t));
@@ -103,16 +103,16 @@ Library.prototype.close = function () {
  */
 
 Library.prototype.get = function (name, size, cb) {
-  debug('get()', name);
-
   // allow passing `cb` as the second argument, with 0 byte-length
   if ('function' === typeof size) {
     cb = size;
     size = 0;
   }
 
+  debug('get(%o, %o, %o)', name, size, cb);
+
   var sym = bindings.dlsym(this.lib_t, name, size, cb);
-  debug('dlsym() result', sym);
+  debug('dlsym(): %o', sym);
 
   if ('number' === typeof sym) {
     // error

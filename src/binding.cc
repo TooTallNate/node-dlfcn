@@ -27,13 +27,7 @@ static int set_dlerror(lib_t* lib);
 NAN_METHOD(Dlopen) {
   NanEscapableScope();
 
-  const char *filename;
-  if (args[0]->IsNull()) {
-    filename = NULL;
-  } else if (args[0]->IsString()) {
-    v8::String::Utf8Value name(args[0]);
-    filename = *name;
-  } else {
+  if (!args[0]->IsNull() && !args[0]->IsString()) {
     return NanThrowTypeError("a string filename, or null must be passed as the first argument");
   }
 
@@ -45,7 +39,13 @@ NAN_METHOD(Dlopen) {
   lib->errmsg = NULL;
 
   // TODO: make RTLD_LAZY configurable
-  lib->handle = dlopen(filename, RTLD_LAZY);
+  int mode = RTLD_LAZY;
+  if (args[0]->IsNull()) {
+    lib->handle = dlopen(NULL, mode);
+  } else if (args[0]->IsString()) {
+    v8::String::Utf8Value name(args[0]);
+    lib->handle = dlopen(*name, mode);
+  }
 
   NanReturnValue(NanNew<v8::Integer>(lib->handle ? 0 : set_dlerror(lib)));
 }

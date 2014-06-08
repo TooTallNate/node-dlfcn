@@ -1,6 +1,7 @@
 node-dlfcn
 ==========
 ### Native bindings to the dynamic shared library linker (dlfcn)
+[![Build Status](https://secure.travis-ci.org/TooTallNate/node-dlfcn.svg)](https://travis-ci.org/TooTallNate/node-dlfcn)
 
 
 This module offers access to the `dlfcn.h` functions, including a proper

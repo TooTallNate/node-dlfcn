@@ -170,7 +170,7 @@ static int set_dlerror(lib_t* lib) {
 void init (v8::Handle<v8::Object> target) {
   NanScope();
 
-  target->Set(NanNew<v8::String>("sizeof_lib_t"), NanNew<v8::Integer>(sizeof(lib_t)));
+  target->Set(NanNew<v8::String>("sizeof_lib_t"), NanNew<v8::Integer>(static_cast<uint32_t>(sizeof(lib_t))));
 
   NODE_SET_METHOD(target, "dlopen", Dlopen);
   NODE_SET_METHOD(target, "dlclose", Dlclose);

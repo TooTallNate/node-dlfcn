@@ -165,12 +165,84 @@ static int set_dlerror(lib_t* lib) {
   }
 }
 
+/**
+ * Callback function invoked when a dlsym() Buffer instance
+ * gets garbage collected from JavaScript.
+ */
+
+void rtld_buffer_cb(char *data, void *hint) {
+  /* this shouldn't really ever happen... */
+}
+
 } // anonymous namespace
 
 void init (v8::Handle<v8::Object> target) {
   NanScope();
 
   target->Set(NanNew<v8::String>("sizeof_lib_t"), NanNew<v8::Integer>(static_cast<uint32_t>(sizeof(lib_t))));
+
+#define CONST_INT(value) \
+  target->ForceSet(NanNew<v8::String>(#value), \
+      NanNew<v8::Integer>(static_cast<uint32_t>(value)), \
+      static_cast<v8::PropertyAttribute>(v8::ReadOnly|v8::DontDelete));
+
+#ifdef RTLD_LAZY
+  CONST_INT(RTLD_LAZY);
+#endif
+
+#ifdef RTLD_NOW
+  CONST_INT(RTLD_NOW);
+#endif
+
+#ifdef RTLD_LOCAL
+  CONST_INT(RTLD_LOCAL);
+#endif
+
+#ifdef RTLD_GLOBAL
+  CONST_INT(RTLD_GLOBAL);
+#endif
+
+#ifdef RTLD_NOLOAD
+  CONST_INT(RTLD_NOLOAD);
+#endif
+
+#ifdef RTLD_NODELETE
+  CONST_INT(RTLD_NODELETE);
+#endif
+
+#ifdef RTLD_FIRST
+  CONST_INT(RTLD_FIRST); /* Mac OS X 10.5 and later */
+#endif
+
+#undef CONST_INT
+
+
+#define CONST_BUFFER(value) \
+  target->ForceSet(NanNew<v8::String>(#value), \
+      NanNewBufferHandle(reinterpret_cast<char *>(value), 0, rtld_buffer_cb, NULL), \
+      static_cast<v8::PropertyAttribute>(v8::ReadOnly|v8::DontDelete));
+
+/*
+ * Special handle arguments for dlsym().
+ */
+#ifdef RTLD_NEXT
+  CONST_BUFFER(RTLD_NEXT); /* Search subsequent objects. */
+#endif
+
+#ifdef RTLD_DEFAULT
+  CONST_BUFFER(RTLD_DEFAULT); /* Use default search algorithm. */
+#endif
+
+#ifdef RTLD_SELF
+  CONST_BUFFER(RTLD_SELF); /* Search this and subsequent objects (Mac OS X 10.5 and later) */
+#endif
+
+#ifdef RTLD_MAIN_ONLY
+  CONST_BUFFER(RTLD_MAIN_ONLY); /* Search main executable only (Mac OS X 10.5 and later) */
+#endif
+
+#undef CONST_BUFFER
+
 
   NODE_SET_METHOD(target, "dlopen", Dlopen);
   NODE_SET_METHOD(target, "dlclose", Dlclose);

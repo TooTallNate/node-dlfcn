@@ -43,12 +43,25 @@
     {
       'target_name': 'dlfcn',
       'type': 'static_library',
+      'link_settings': {
+        'libraries': [
+          '-lpsapi',
+        ]
+      },
       'include_dirs': [ '.' ],
       'direct_dependent_settings': {
         'include_dirs': [ '.' ],
       },
       'defines': [ ],
       'sources': [ './dlfcn.c', ],
+    },
+
+    {
+      'target_name': 'testdll',
+      'product_prefix': '',
+      'product_extension': 'dll',
+      'type': 'shared_library',
+      'sources': [ './testdll.c', ],
     },
 
     {

@@ -1,8 +1,8 @@
 node-dlfcn
 ==========
 ### Native bindings to the dynamic shared library linker (dlfcn)
-[![Build Status](https://secure.travis-ci.org/TooTallNate/node-dlfcn.svg)](https://travis-ci.org/TooTallNate/node-dlfcn)
-
+[![Build Status](https://travis-ci.org/TooTallNate/node-dlfcn.svg?branch=master)](https://travis-ci.org/TooTallNate/node-dlfcn)
+[![Build Status](https://ci.appveyor.com/api/projects/status/4ehbuqbh1jajasnw?svg=true)](https://ci.appveyor.com/project/TooTallNate/node-dlfcn)
 
 This module offers access to the `dlfcn.h` functions, including a proper
 emulation for Windows operating systems.

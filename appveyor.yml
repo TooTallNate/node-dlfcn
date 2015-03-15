@@ -10,7 +10,8 @@ environment:
 # Install scripts. (runs after repo cloning)
 install:
   # Get the latest stable version of Node 0.STABLE.latest
-  - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version)
+  - ps: if($env:nodejs_version -eq "0.8") {Install-Product node $env:nodejs_version}
+  - ps: if($env:nodejs_version -ne "0.8") {Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version)}
   # Typical npm stuff.
   - npm install
 

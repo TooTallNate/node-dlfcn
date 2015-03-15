@@ -38,8 +38,14 @@ NAN_METHOD(Dlopen) {
 
   lib->errmsg = NULL;
 
-  // TODO: make RTLD_LAZY configurable
-  int mode = RTLD_LAZY;
+  /* figure out which RTLD "mode" to use */
+  int mode;
+  if (args[2]->IsNumber()) {
+    mode = args[2]->IntegerValue();
+  } else {
+    mode = RTLD_LAZY;
+  }
+
   if (args[0]->IsNull()) {
     lib->handle = dlopen(NULL, mode);
   } else if (args[0]->IsString()) {

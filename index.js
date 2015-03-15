@@ -42,10 +42,12 @@ exports.ext = {
  * dlopen(), dlclose(), dlsym() and dlerror() functions.
  *
  * @param {String} name - Library name or full filepath
- * @api private
+ * @param {RTLD} mode - RTLD constant "mode" to open the library as (`RTLD_LAZY` by default)
+ * @class
+ * @public
  */
 
-function Library (name) {
+function Library (name, mode) {
   if (!(this instanceof Library)) return new Library(name);
 
   if (name) {
@@ -60,14 +62,14 @@ function Library (name) {
     name = null;
   }
 
-  debug('library name: %o', name);
+  debug('library name: %o, mode: %o', name, mode);
   this.name = name;
 
   // create the `lib_t` data space
   this.lib_t = new Buffer(bindings.sizeof_lib_t);
 
   // do the `dlopen()` dance
-  var r = bindings.dlopen(name, this.lib_t);
+  var r = bindings.dlopen(name, this.lib_t, mode);
   debug('dlopen(): %o', r);
   if (0 !== r) {
     // error

@@ -31,13 +31,13 @@
   },
   "homepage": "https://github.com/TooTallNate/node-dlfcn",
   "dependencies": {
-    "bindings": "1.2.0",
-    "debug": "1.0.1",
-    "nan": "1.2.0"
+    "bindings": "1.2.1",
+    "debug": "2",
+    "nan": "1.7.0"
   },
   "devDependencies": {
     "glob": "3.2.11",
-    "mocha": "1.20.0",
-    "ref": "0.3.0"
+    "mocha": "2",
+    "ref": "1.0.0"
   }
 }

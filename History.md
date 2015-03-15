@@ -1,4 +1,18 @@
 
+1.0.0 / 2015-03-15
+==================
+
+  * README: add appveyor build badge
+  * make the `dlopen()` RTLD "mode" configurable
+  * export the RTLD_* constants
+  * appveyor: attempt to possibly fix v0.8
+  * appveyor: test node v0.12 instead of v0.11
+  * travis: test node v0.12 instead of v0.11
+  * travis: don't test node v0.6
+  * fix build with newer "nan"
+  * package: update all deps
+  * update "dlfcn-win32" to aa91d3a6a5450609434fdf8a18fac95e700c574b
+
 0.0.2 / 2014-06-11
 ==================
 

@@ -1,6 +1,7 @@
 /*
  * dlfcn-win32
  * Copyright (c) 2007 Ramiro Polla
+ * Copyright (c) 2015 Tiancheng "Timothy" Gu
  *
  * dlfcn-win32 is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,12 +18,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifdef _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif
 #define PSAPI_VERSION 1
 #include <windows.h>
 #include <psapi.h>
 #include <stdio.h>
 
+#ifdef SHARED
 #define DLFCN_WIN32_EXPORTS
+#endif
 #include "dlfcn.h"
 
 /* Note:
@@ -48,7 +56,7 @@ static global_object *global_search( global_object *start, HMODULE hModule )
     if( hModule == NULL )
         return NULL;
 
-    for (pobject = start; pobject; pobject = pobject->next)
+    for( pobject = start; pobject; pobject = pobject->next )
         if( pobject->hModule == hModule )
             return pobject;
 
@@ -69,15 +77,16 @@ static void global_add( global_object *start, HMODULE hModule )
     if( pobject )
         return;
 
-    if (start == &first_automatic_object) {
-        pobject = global_search(&first_object, hModule);
-        if (pobject)
+    if( start == &first_automatic_object )
+    {
+        pobject = global_search( &first_object, hModule );
+        if( pobject )
             return;
     }
 
-    for( pobject = start; pobject->next ; pobject = pobject->next );
+    for( pobject = start; pobject->next; pobject = pobject->next );
 
-    nobject = malloc( sizeof(global_object) );
+    nobject = malloc( sizeof( global_object ) );
 
     /* Should this be enough to fail global_add, and therefore also fail
      * dlopen?
@@ -191,7 +200,7 @@ void *dlopen( const char *file, int mode )
     if( file == 0 )
     {
         HMODULE hAddtnlMods[1024]; // Already loaded modules
-        HANDLE hCurrentProc = GetCurrentProcess();
+        HANDLE hCurrentProc = GetCurrentProcess( );
         DWORD cbNeeded;
 
         /* POSIX says that if the value of file is 0, a handle on a global
@@ -210,13 +219,14 @@ void *dlopen( const char *file, int mode )
             save_err_ptr_str( file );
 
 
-        /* GetModuleHandle(NULL) only returns the current program file. So if we
-         * want to get ALL loaded module including those in linked DLLs, we have
-         * to use EnumProcessModules().
+        /* GetModuleHandle( NULL ) only returns the current program file. So
+	 * if we want to get ALL loaded module including those in linked DLLs,
+	 * we have to use EnumProcessModules( ).
          */
-        if( EnumProcessModules( hCurrentProc, hAddtnlMods, sizeof( hAddtnlMods ), &cbNeeded ) != 0 )
+        if( EnumProcessModules( hCurrentProc, hAddtnlMods,
+                                sizeof( hAddtnlMods ), &cbNeeded ) != 0 )
         {
-            int i;
+            DWORD i;
             for( i = 0; i < cbNeeded / sizeof( HMODULE ); i++ )
             {
                 global_add( &first_automatic_object, hAddtnlMods[i] );
@@ -268,14 +278,16 @@ void *dlopen( const char *file, int mode )
     return (void *) hModule;
 }
 
-static void free_auto() {
+static void free_auto( )
+{
     global_object *pobject = first_automatic_object.next;
-    printf("freeing autos\n");
-    if (pobject) {
+    if( pobject )
+    {
         global_object *next;
-        for (; pobject; pobject = next) {
+        for ( ; pobject; pobject = next )
+        {
             next = pobject->next;
-            free(pobject);
+            free( pobject );
         }
         first_automatic_object.next = NULL;
     }
@@ -293,15 +305,17 @@ int dlclose( void *handle )
     /* If the object was loaded with RTLD_GLOBAL, remove it from list of global
      * objects.
      */
-    if (ret) {
-        HMODULE cur = GetModuleHandle(NULL);
-        global_rem(&first_object, hModule);
-        if (hModule == cur) {
+    if( ret )
+    {
+        HMODULE cur = GetModuleHandle( NULL );
+        global_rem( &first_object, hModule );
+        if( hModule == cur )
+        {
             auto_ref_count--;
-            if (auto_ref_count < 0)
+            if( auto_ref_count < 0 )
                 auto_ref_count = 0;
-            if (!auto_ref_count)
-                free_auto();
+            if( !auto_ref_count )
+                free_auto( );
         }
     }
     else
@@ -321,7 +335,7 @@ void *dlsym( void *handle, const char *name )
 
     symbol = GetProcAddress( handle, name );
 
-    if (symbol != NULL)
+    if( symbol != NULL )
         goto end;
 
     /* If the handle for the original program file is passed, also search
@@ -334,21 +348,21 @@ void *dlsym( void *handle, const char *name )
     {
         global_object *pobject;
 
-        for (pobject = &first_object; pobject; pobject = pobject->next)
+        for( pobject = &first_object; pobject; pobject = pobject->next )
         {
-            if (pobject->hModule)
+            if( pobject->hModule )
             {
-                symbol = GetProcAddress(pobject->hModule, name);
-                if (symbol != NULL)
+                symbol = GetProcAddress( pobject->hModule, name );
+                if( symbol != NULL )
                     goto end;
             }
         }
 
-        for( pobject = &first_automatic_object; pobject ; pobject = pobject->next )
+        for( pobject = &first_automatic_object; pobject; pobject = pobject->next )
         {
             if( pobject->hModule )
             {
-                symbol = GetProcAddress(pobject->hModule, name);
+                symbol = GetProcAddress( pobject->hModule, name );
                 if( symbol != NULL )
                     goto end;
             }
@@ -359,6 +373,10 @@ end:
     if( symbol == NULL )
         save_err_str( name );
 
+//  warning C4054: 'type cast' : from function pointer 'FARPROC' to data pointer 'void *'
+#ifdef _MSC_VER
+#pragma warning( suppress: 4054 )
+#endif
     return (void*) symbol;
 }
 
@@ -373,3 +391,23 @@ char *dlerror( void )
 
     return error_pointer;
 }
+
+#ifdef SHARED
+BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
+{
+    (void) hinstDLL;
+    /*
+     * https://msdn.microsoft.com/en-us/library/windows/desktop/ms682583(v=vs.85).aspx 
+     *
+     *     When handling DLL_PROCESS_DETACH, a DLL should free resources such as heap
+     *     memory only if the DLL is being unloaded dynamically (the lpReserved
+     *     parameter is NULL).
+     */
+    if( fdwReason == DLL_PROCESS_DETACH && !lpvReserved )
+    {
+        auto_ref_count = 0;
+        free_auto( );
+    }
+    return TRUE;
+}
+#endif

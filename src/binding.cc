@@ -4,6 +4,8 @@
 
 #include <dlfcn.h>
 
+#include <limits.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -41,7 +43,10 @@ NAN_METHOD(Dlopen) {
   /* figure out which RTLD "mode" to use */
   int mode;
   if (args[2]->IsNumber()) {
-    mode = args[2]->IntegerValue();
+    int64_t orig = args[2]->IntegerValue();
+    if (orig > INT_MAX || orig < INT_MIN)
+      return NanThrowRangeError("Mode exceeds the range of C int");
+    mode = orig;
   } else {
     mode = RTLD_LAZY;
   }

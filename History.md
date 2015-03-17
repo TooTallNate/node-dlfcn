@@ -1,4 +1,11 @@
 
+1.0.1 / 2015-03-17
+==================
+
+  * Check if mode is out-of-range of `int` (#1, @TimothyGu)
+  * Fix specifying `mode` w/o using `new` (#1, @TimothyGu)
+  * update "dlfcn-win32" to 718d27cf55bc9765f2f6e501b694d788ba77775d
+
 1.0.0 / 2015-03-15
 ==================
 

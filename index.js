@@ -48,7 +48,7 @@ exports.ext = {
  */
 
 function Library (name, mode) {
-  if (!(this instanceof Library)) return new Library(name);
+  if (!(this instanceof Library)) return new Library(name, mode);
 
   if (name) {
     // append the `ext` if necessary
